@@ -1,0 +1,2 @@
+<?php
+// salient is golden
