@@ -24,27 +24,21 @@ class ContentBlockWidget extends WP_Widget {
 	}
 
 	/**
-	 * Saves the settings for all instances of the widget class.
+	 * @param $instance
+	 * @param $title
+	 * @param $cbid
 	 *
-	 * @since 2.8.0
-	 *
-	 * @param array $settings Multi-dimensional array of widget instance settings.
+	 * @return bool
 	 */
-	public function save_settings( $settings ) {
-		$settings['_multiwidget'] = 1;
-		update_option( $this->option_name, $settings );
-	}
-
 	public function get_widget_info( $instance, &$title, &$cbid ) {
-
 		$title = '';
-		if ( isset( $instance[ 'title' ] ) ) {
-			$title = strip_tags( strval( $instance[ 'title' ] ) );
+		if ( isset( $instance['title'] ) ) {
+			$title = strip_tags( strval( $instance['title'] ) );
 		}
 
 		$cbid = '';
-		if ( isset( $instance[ 'cbid' ] ) ) {
-			$cbid = $this->plugin->get_clean_id( $instance[ 'cbid' ] );
+		if ( isset( $instance['cbid'] ) ) {
+			$cbid = $this->plugin->get_clean_id( $instance['cbid'] );
 			if ( $cbid === false ) {
 				$cbid = '';
 			} elseif ( ! isset( $this->plugin->content_block_list[ $cbid ] ) ) {
