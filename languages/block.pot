@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Content Blocks\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-08-19 20:39+0000\n"
+"POT-Creation-Date: 2022-11-15 00:21+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: \n"
@@ -14,39 +14,64 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Loco https://localise.biz/"
 
-#: includes/cb_main.php:150
-msgid " found"
+#: includes/ContentBlock.php:640
+#, php-format
+msgid ""
+"<strong>%s</strong> requires <strong><a href=\"http://bit.ly/vcomposer\" "
+"target=\"_blank\">WPBakery Page builder</a></strong> plugin to be installed "
+"and activated on your site."
 msgstr ""
 
-#: includes/cb_main.php:151
-msgid " found in Trash"
+#: includes/ContentBlock.php:134
+msgid "Add block"
 msgstr ""
 
-#: includes/cb_main.php:834
-msgid "Add block of custom content"
+#: includes/ContentBlock.php:618
+msgid "Add content block"
 msgstr ""
 
-#: includes/cb_main.php:432
+#: includes/ContentBlock.php:135
+msgid "Add new block"
+msgstr ""
+
+#: includes/ContentBlock.php:106 includes/ContentBlock.php:320
 msgid "Add Paragraph Tags / No Shortcodes"
 msgstr ""
 
-#: includes/cb_main.php:431
+#: includes/ContentBlock.php:105 includes/ContentBlock.php:319
 msgid "Add Paragraph Tags / Run Shortcodes"
 msgstr ""
 
-#: includes/cb_main.php:269
-msgid "Basic Shortcode"
+#. Author of the plugin
+msgid "Aleksey Tikhomirov"
 msgstr ""
 
-#: includes/cb_main.php:185 includes/cb_widget.php:11
+#: includes/ContentBlock.php:133
+msgid "All blocks"
+msgstr ""
+
+#: includes/ContentBlock.php:100
+msgid "Block"
+msgstr ""
+
+#: includes/ContentBlock.php:271
+msgid "Block usage"
+msgstr ""
+
+#: includes/ContentBlock.php:101
+msgid "Blocks"
+msgstr ""
+
+#: includes/ContentBlock.php:99 includes/ContentBlock.php:177
+#: includes/ContentBlockWidget.php:13
 msgid "Content Block"
 msgstr ""
 
-#: includes/cb_main.php:367
-msgid "Content Block Usage Codes"
+#: includes/ContentBlock.php:617
+msgid "Content block"
 msgstr ""
 
-#: includes/cb_widget.php:77
+#: includes/ContentBlockWidget.php:81
 msgid "Content Block:"
 msgstr ""
 
@@ -54,27 +79,23 @@ msgstr ""
 msgid "Content Blocks"
 msgstr ""
 
-#. Description of the plugin
-msgid "Content Blocks plugin"
-msgstr ""
-
-#: includes/cb_widget.php:86
+#: includes/ContentBlockWidget.php:92
 msgid "Content Filtering / Paragraph Tags:"
 msgstr ""
 
-#: includes/cb_main.php:270
+#: includes/ContentBlock.php:234
 msgid "Date"
 msgstr ""
 
-#: includes/cb_main.php:293
-msgid "Enter content block name here"
+#: includes/ContentBlock.php:136
+msgid "Edit block"
 msgstr ""
 
-#: includes/cb_main.php:436
-msgid "Example usage code"
+#: includes/ContentBlock.php:259
+msgid "Enter block title"
 msgstr ""
 
-#: includes/cb_main.php:433
+#: includes/ContentBlock.php:107 includes/ContentBlock.php:321
 msgid "Full Content Filtering"
 msgstr ""
 
@@ -86,62 +107,78 @@ msgstr ""
 msgid "https://rwsite.ru/"
 msgstr ""
 
-#: includes/cb_main.php:425
+#: includes/ContentBlock.php:313
 msgid "ID"
 msgstr ""
 
-#: includes/cb_main.php:416
-msgid "New post"
+#: includes/ContentBlock.php:137 includes/ContentBlock.php:305
+msgid "New block"
 msgstr ""
 
-#: includes/cb_main.php:430
+#: includes/ContentBlock.php:140
+msgid "No blocks found"
+msgstr ""
+
+#: includes/ContentBlock.php:141
+msgid "No blocks found in the Trash"
+msgstr ""
+
+#: includes/ContentBlock.php:104 includes/ContentBlock.php:318
 msgid "No Paragraph Tags / No Shortcodes"
 msgstr ""
 
-#: includes/cb_main.php:429
+#: includes/ContentBlock.php:103 includes/ContentBlock.php:317
 msgid "No Paragraph Tags / Run Shortcodes"
 msgstr ""
 
-#: includes/cb_main.php:422
+#: includes/ContentBlock.php:142
+msgid "Parent block"
+msgstr ""
+
+#: includes/ContentBlock.php:310
 msgid "PHP"
 msgstr ""
 
-#: includes/cb_widget.php:11
+#: includes/ContentBlockWidget.php:14
 msgid "Place a content/text block in the selected area."
 msgstr ""
 
-#. Author of the plugin
-msgid "RWSITE.RU"
+#. Description of the plugin
+msgid "Repeatable Content Blocks plugin"
 msgstr ""
 
-#: includes/cb_main.php:846
+#: includes/ContentBlock.php:333
+msgid "Save block before to use it"
+msgstr ""
+
+#: includes/ContentBlock.php:139
+msgid "Search block"
+msgstr ""
+
+#: includes/ContentBlock.php:628
 msgid "Select Content Block by slug"
 msgstr ""
 
-#: includes/cb_main.php:849
+#: includes/ContentBlock.php:631
 msgid "Select content block to insert on this page"
 msgstr ""
 
-#: includes/cb_main.php:421
+#: includes/ContentBlock.php:233 includes/ContentBlock.php:309
 msgid "Shortcode"
 msgstr ""
 
-#: includes/cb_main.php:426
+#: includes/ContentBlock.php:314
 msgid "Slug"
 msgstr ""
 
-#: includes/cb_main.php:268
+#: includes/ContentBlock.php:232
 msgid "Title"
 msgstr ""
 
-#: includes/cb_widget.php:73
+#: includes/ContentBlockWidget.php:77
 msgid "Title:"
 msgstr ""
 
-#: includes/cb_main.php:459
-msgid "Usage & About"
-msgstr ""
-
-#: includes/cb_main.php:459
-msgid "Version"
+#: includes/ContentBlock.php:138
+msgid "View block"
 msgstr ""

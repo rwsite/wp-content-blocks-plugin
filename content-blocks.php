@@ -2,9 +2,9 @@
 /**
  * Plugin Name: Content Blocks
  * Plugin URI:  http://rwsite.ru/
- * Description: Content Blocks plugin
+ * Description: Repeatable Content Blocks plugin
  * Version:     1.0.0
- * Text Domain: rw-block
+ * Text Domain: block
  * Domain Path: /languages/
  * Author:      Aleksey Tikhomirov
  * Author URI:  https://rwsite.ru/
@@ -12,14 +12,14 @@
 */
 
 
-defined( 'ABSPATH' ) or die();
+defined( 'ABSPATH' ) || die();
 
-require_once 'includes/cb_main.php';
-require_once 'includes/cb_widget.php';
+require_once 'includes/ContentBlock.php';
+require_once 'includes/ContentBlockWidget.php';
 
-$plugin = new cb_main(['file' => __FILE__]);
+$plugin = new ContentBlock(__FILE__);
 $plugin->add_actions();
 
-register_activation_hook( __FILE__, cb_main::class . '::plugin_activate' );
-register_deactivation_hook( __FILE__, cb_main::class . '::plugin_deactivate' );
+register_activation_hook( __FILE__, ContentBlock::class . '::plugin_activate' );
+register_deactivation_hook( __FILE__, ContentBlock::class . '::plugin_deactivate' );
 
