@@ -5,7 +5,8 @@
 
 class ContentBlock {
 
-	private static $file = null;
+	protected static $file = null;
+    protected static $instance;
 
 	public $plugin_name;
     public $plugin_version;
@@ -35,7 +36,14 @@ class ContentBlock {
     public $var_values = array();
 	public $post;
 
-	public function __construct($file = null) {
+    public static function get_Instance($file = null){
+        if ( !isset(static::$instance) ) {
+            static::$instance = new static($file);
+        }
+        return static::$instance;
+    }
+
+	private function __construct($file = null) {
 
         $this->plugin_version = '1.0.0';
         $this->option_name = 'cb_option';
@@ -46,13 +54,13 @@ class ContentBlock {
         $this->post_type_menu_icon = 'dashicons-screenoptions';
         $this->usage_about_page = 'cb_usage_about_page';
         $this->post_type_shortcode = $this->post_type_slug ;
-            
-		$plugin_file = $this->set_file($file);
 
-		$this->plugin_file     = $plugin_file;
+		$this->plugin_file     = $file;
 		$this->plugin_path     = plugin_dir_path( $this->plugin_file );
 		$this->plugin_url      = plugin_dir_url( $this->plugin_file );
 		$this->plugin_basename = plugin_basename( $this->plugin_file );
+        $this->get_list();
+        $this->get_para_list();
 	}
 
 	public static function plugin_activate() {
@@ -61,18 +69,6 @@ class ContentBlock {
 
 	public static function plugin_deactivate() {
 		flush_rewrite_rules();
-	}
-
-	/**
-	 * @param $file
-	 *
-	 * @return string|null
-	 */
-	public function set_file( $file ) {
-		if ( empty( self::$file ) ) {
-			self::$file = $file;
-		}
-		return self::$file;
 	}
 
 	/**
@@ -99,7 +95,6 @@ class ContentBlock {
 		$this->plugin_name      = __( 'Content Block', 'block' );
 		$this->post_type_label  = __( 'Content Block', 'block' );
 		$this->post_type_labels = __( 'Blocks', 'block' );
-
 
 		load_plugin_textdomain( 'block', false, dirname( plugin_basename( $this->plugin_file ) ) . '/languages/');
     }
@@ -207,7 +202,7 @@ class ContentBlock {
 	}
 
 	public function register_widget() {
-		register_widget( 'ContentBlockWidget' );
+		register_widget( ContentBlockWidget::class );
 	}
 
 	public function do_wp_head() {
@@ -514,11 +509,9 @@ class ContentBlock {
 	}
 
 	public function get_clean_id( $id = false ) {
-		if ( preg_match( '/^((0{1})|([1-9]{1})|([1-9]{1}[0-9]*))$/', trim( strval( $id ) ) ) === 1 ) {
-			if ( isset( $this->content_block_list[ $id ] ) ) {
-				return intval( $id );
-			}
-		}
+        if ( is_numeric($id) && isset( $this->content_block_list[ $id ] ) ) {
+            return intval( $id );
+        }
 
 		return false;
 	}

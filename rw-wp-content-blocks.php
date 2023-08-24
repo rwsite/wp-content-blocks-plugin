@@ -17,7 +17,7 @@ defined( 'ABSPATH' ) || die();
 require_once 'includes/ContentBlock.php';
 require_once 'includes/ContentBlockWidget.php';
 
-$plugin = new ContentBlock(__FILE__);
+$plugin = ContentBlock::get_Instance(__FILE__);
 $plugin->add_actions();
 
 register_activation_hook( __FILE__, ContentBlock::class . '::plugin_activate' );
