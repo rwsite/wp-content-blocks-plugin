@@ -38,7 +38,6 @@ class ContentBlockWidget extends WP_Widget {
 		$cbid = '';
 		if ( isset( $instance['cbid'] ) ) {
 			$cbid = $this->plugin->get_clean_id( $instance['cbid'] );
-            console_log(['$cbid' => $cbid, '$instance' => $instance]);
 			if ( $cbid === false ) {
 				$cbid = '';
 			} elseif ( ! isset( $this->plugin->content_block_list[ $cbid ] ) ) {
