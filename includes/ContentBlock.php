@@ -75,7 +75,9 @@ class ContentBlock {
 	 * @return void
 	 */
 	public function add_actions(){
-	    
+
+        load_plugin_textdomain( 'block', false, dirname( plugin_basename( $this->plugin_file ) ) . '/languages/');
+
         add_action( 'init',                         [$this, 'register_post'] );
         add_action( 'widgets_init',                 [$this, 'register_widget'] );
         add_action( 'wp_head',                      [$this, 'do_wp_head'] );
@@ -96,7 +98,46 @@ class ContentBlock {
 		$this->post_type_label  = __( 'Content Block', 'block' );
 		$this->post_type_labels = __( 'Blocks', 'block' );
 
-		load_plugin_textdomain( 'block', false, dirname( plugin_basename( $this->plugin_file ) ) . '/languages/');
+        // register feature
+        add_action('setup_theme', [$this, 'register_theme_feature'], 10,2 );
+        // run
+
+        /*add_action( 'admin_enqueue_scripts', function() {
+            if ( 'profile' !== get_current_screen()->id ) {
+                return;
+            }
+
+            // подключаем редактор кода для HTML.
+            $settings = wp_enqueue_code_editor( array( 'type' => 'text/html' ) );
+
+            // ничего не делаем если CodeMirror отключен.
+            if ( false === $settings ) {
+                return;
+            }
+
+            // инициализация
+            wp_add_inline_script(
+                'code-editor',
+                sprintf( 'jQuery( function() { wp.codeEditor.initialize( "code_editor", %s ); } );', wp_json_encode( $settings ) )
+            );
+
+        } );
+
+        add_action('edit_form_after_editor', function (WP_Post $post){
+            */?><!--
+            <div class="wp-core-ui wp-editor-wrap">
+                <textarea id="code_editor" name="description" rows="5" cols="30"></textarea>
+            </div>
+            --><?php
+/*        });*/
+    }
+
+    public function register_theme_feature()
+    {
+        register_theme_feature('code_editor', [
+            'description'  => __( 'PHP code editor','block' ),
+            'show_in_rest' => false,
+        ]);
     }
 
 	/**
@@ -141,9 +182,9 @@ class ContentBlock {
 			'hierarchical'         => false,
 			'supports'             => [
 				'title',
-				'editor',
+				/*'editor',*/
 				'thumbnail',
-				'js_editor',
+				'code_editor',
 			],                         /** @see ContentBlock::meta_box() */
 			'register_meta_box_cb' => [$this, 'meta_box'],
 			'has_archive'          => false
@@ -216,13 +257,12 @@ class ContentBlock {
 	}
 
 	public function reorder_list( $query ) {
-
-		if ( $query->is_admin ) {
-			if ( $query->get( 'post_type' ) == $this->post_type_slug ) {
-				$query->set( 'orderby', 'post_title' );
-				$query->set( 'order', 'ASC' );
-			}
-		}
+        if ($query->is_admin) {
+            if ($query->get('post_type') == $this->post_type_slug) {
+                $query->set('orderby', 'post_title');
+                $query->set('order', 'ASC');
+            }
+        }
 
 		return $query;
 	}
@@ -250,7 +290,7 @@ class ContentBlock {
 		switch ( $column ) {
 			case $this->post_type_slug . 'shortcode' :
 				echo '<input type="text" class="cb_read_only_input" value="' .
-				     esc_attr( '[' . $this->post_type_shortcode . ' slug="' . $post->post_name . '"]' ) . '" style="width: 270px !important;"/>';
+				     esc_attr( '[' . $this->post_type_shortcode . ' slug="' . $post->post_name . '"]' ) . '" />';
 				break;
 			default :
 				break;
