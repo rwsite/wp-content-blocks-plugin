@@ -3,6 +3,7 @@
   "description": "WordPress Repeatable Content Blocks plugin",
   "minimum-stability": "stable",
   "license": "proprietary",
+  "type": "wordpress-plugin",
   "authors": [
     {
       "name": "Aleksei Tikhomirov",
