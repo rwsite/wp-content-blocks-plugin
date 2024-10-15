@@ -3,12 +3,16 @@
  * Reusable content block
  */
 
-class ContentBlock {
+namespace content_block;
 
-	protected static $file = null;
+use WP_Post;
+
+final class ContentBlock
+{
+    protected static $file = null;
     protected static $instance;
 
-	public $plugin_name;
+    public $plugin_name;
     public $plugin_version;
     public $option_name;
     public $option_prefix;
@@ -34,17 +38,19 @@ class ContentBlock {
     public $option_values = array();
     public $para_list;
     public $var_values = array();
-	public $post;
+    public $post;
 
-    public static function get_Instance($file = null){
-        if ( !isset(static::$instance) ) {
-            static::$instance = new static($file);
+
+    public static function get_Instance($file = null): ContentBlock
+    {
+        if (!isset(ContentBlock::$instance)) {
+            ContentBlock::$instance = new ContentBlock($file);
         }
-        return static::$instance;
+        return ContentBlock::$instance;
     }
 
-	private function __construct($file = null) {
-
+    private function __construct($file = null)
+    {
         $this->plugin_version = '1.0.0';
         $this->option_name = 'cb_option';
         $this->option_prefix = $this->option_name;
@@ -53,210 +59,190 @@ class ContentBlock {
         $this->post_type_slug = 'block';
         $this->post_type_menu_icon = 'dashicons-screenoptions';
         $this->usage_about_page = 'cb_usage_about_page';
-        $this->post_type_shortcode = $this->post_type_slug ;
+        $this->post_type_shortcode = $this->post_type_slug;
 
-		$this->plugin_file     = $file;
-		$this->plugin_path     = plugin_dir_path( $this->plugin_file );
-		$this->plugin_url      = plugin_dir_url( $this->plugin_file );
-		$this->plugin_basename = plugin_basename( $this->plugin_file );
+        $this->plugin_file = $file;
+        $this->plugin_path = plugin_dir_path($this->plugin_file);
+        $this->plugin_url = plugin_dir_url($this->plugin_file);
+        $this->plugin_basename = plugin_basename($this->plugin_file);
         $this->get_list();
         $this->get_para_list();
-	}
+    }
 
-	public static function plugin_activate() {
-		flush_rewrite_rules();
-	}
+    /**
+     * Get list
+     *
+     * @return void
+     */
+    public function get_list()
+    {
+        $args = [
+            'post_type'   => $this->post_type_slug,
+            'post_status' => 'publish',
+            'nopaging'    => true
+        ];
 
-	public static function plugin_deactivate() {
-		flush_rewrite_rules();
-	}
+        $content_blocks = get_posts($args);
+        $this->content_block_list = [];
 
-	/**
-	 * @return void
-	 */
-	public function add_actions(){
+        foreach ($content_blocks as $content_block) {
+            $this->content_block_list[$content_block->ID]
+                = $content_block->post_title;
+            $this->content_block_slug_list[$content_block->ID]
+                = $content_block->post_name;
+            $this->content_block_list_by_slug[$content_block->post_name]
+                = $content_block->ID;
+        }
+    }
 
-        load_plugin_textdomain( 'block', false, dirname( plugin_basename( $this->plugin_file ) ) . '/languages/');
+    public function get_para_list()
+    {
+        $this->para_list = [
+            'none'                     => __('No Paragraph Tags / Run Shortcodes',
+                'block'),
+            'no-shortcodes'            => __('No Paragraph Tags / No Shortcodes',
+                'block'),
+            'paragraphs'               => __('Add Paragraph Tags / Run Shortcodes',
+                'block'),
+            'paragraphs-no-shortcodes' => __('Add Paragraph Tags / No Shortcodes',
+                'block'),
+            'full'                     => __('Full Content Filtering', 'block'),
+        ];
+    }
 
-        add_action( 'init',                         [$this, 'register_post'] );
-        add_action( 'widgets_init',                 [$this, 'register_widget'] );
-        add_action( 'wp_head',                      [$this, 'do_wp_head'] );
-        add_action( 'admin_enqueue_scripts',        [$this, 'enqueue_scripts'] );
-        add_filter( 'pre_get_posts',                [$this,'reorder_list'] );
-        add_filter( 'manage_' . $this->post_type_slug . '_posts_columns', [$this, 'set_column_titles'] );
-        add_action( 'manage_' . $this->post_type_slug . '_posts_custom_column', [$this, 'set_columns'], 10, 2 );
-        add_filter( 'enter_title_here',             [$this, 'change_title_text'] );
+    /**
+     * @return void
+     */
+    public function add_actions()
+    {
+        load_plugin_textdomain('block', false,
+            dirname(plugin_basename($this->plugin_file)).'/languages/');
 
-        add_shortcode( $this->post_type_shortcode,  [$this, 'content_block_shortcode'] );
-        add_filter( 'the_content',                  [$this,'do_the_content'] );
-        add_action( 'wp_ajax_cb_hide_notice',       [$this, 'hide_notice'] );
+        add_action('init', [$this, 'register_post']);
+        add_action('widgets_init', [$this, 'register_widget']);
+        add_action('wp_head', [$this, 'do_wp_head']);
+        add_action('admin_enqueue_scripts', [$this, 'enqueue_scripts']);
+        add_filter('pre_get_posts', [$this, 'reorder_list']);
+        add_filter('manage_'.$this->post_type_slug.'_posts_columns',
+            [$this, 'set_column_titles']);
+        add_action('manage_'.$this->post_type_slug.'_posts_custom_column',
+            [$this, 'set_columns'], 10, 2);
+        add_filter('enter_title_here', [$this, 'change_title_text']);
+
+        add_shortcode($this->post_type_shortcode,
+            [$this, 'content_block_shortcode']);
+        add_filter('the_content', [$this, 'do_the_content']);
+        add_action('wp_ajax_cb_hide_notice', [$this, 'hide_notice']);
 
         // We safely integrate with VC with this hook
-        add_action( 'init', [$this, 'integrateWithVC'] );
+        add_action('init', [$this, 'integrateWithVC']);
 
-		$this->plugin_name      = __( 'Content Block', 'block' );
-		$this->post_type_label  = __( 'Content Block', 'block' );
-		$this->post_type_labels = __( 'Blocks', 'block' );
+        $this->plugin_name = __('Content Block', 'block');
+        $this->post_type_label = __('Content Block', 'block');
+        $this->post_type_labels = __('Blocks', 'block');
 
-        // register feature
-        add_action('setup_theme', [$this, 'register_theme_feature'], 10,2 );
-        // run
-
-        /*add_action( 'admin_enqueue_scripts', function() {
-            if ( 'profile' !== get_current_screen()->id ) {
-                return;
-            }
-
-            // подключаем редактор кода для HTML.
-            $settings = wp_enqueue_code_editor( array( 'type' => 'text/html' ) );
-
-            // ничего не делаем если CodeMirror отключен.
-            if ( false === $settings ) {
-                return;
-            }
-
-            // инициализация
-            wp_add_inline_script(
-                'code-editor',
-                sprintf( 'jQuery( function() { wp.codeEditor.initialize( "code_editor", %s ); } );', wp_json_encode( $settings ) )
-            );
-
-        } );
-
-        add_action('edit_form_after_editor', function (WP_Post $post){
-            */?><!--
-            <div class="wp-core-ui wp-editor-wrap">
-                <textarea id="code_editor" name="description" rows="5" cols="30"></textarea>
-            </div>
-            --><?php
-/*        });*/
+        add_action('setup_theme', [$this, 'register_theme_feature'], 10, 2);
     }
 
     public function register_theme_feature()
     {
         register_theme_feature('code_editor', [
-            'description'  => __( 'PHP code editor','block' ),
+            'description'  => __('PHP code editor', 'block'),
             'show_in_rest' => false,
         ]);
     }
 
-	/**
-	 * @return void
-	 */
-	public function register_post() {
+    /**
+     * @return void
+     */
+    public function register_post()
+    {
+        $user = wp_get_current_user();
+        $allowed_roles = [
+            'editor',
+            'administrator',
+            'author'
+        ];
+        $publicly_queryable = array_intersect($allowed_roles, $user->roles);
 
-		$user               = wp_get_current_user();
-		$allowed_roles      = [
-			'editor',
-			'administrator',
-			'author'
-		];
-		$publicly_queryable = array_intersect( $allowed_roles, $user->roles );
+        register_post_type($this->post_type_slug, [
+            'label'                => __('Content Blocks', 'block'),
+            'labels'               => [
+                'name'               => __('Content Blocks', 'block'),
+                'singular_name'      => $this->post_type_label,
+                'menu_name'          => __('Content Blocks', 'block'),
+                'name_admin_bar'     => $this->post_type_label,
+                'all_items'          => __('All blocks', 'block'),
+                'add_new'            => __('Add block', 'block'),
+                'add_new_item'       => __('Add new block', 'block'),
+                'edit_item'          => __('Edit block', 'block'),
+                'new_item'           => __('New block', 'block'),
+                'view_item'          => __('View block', 'block'),
+                'search_items'       => __('Search block', 'block'),
+                'not_found'          => __('No blocks found', 'block'),
+                'not_found_in_trash' => __('No blocks found in the Trash',
+                    'block'),
+                'parent_item_colon'  => __('Parent block', 'block')
+            ],
+            'public'               => $publicly_queryable,
+            'exclude_from_search'  => true,
+            'publicly_queryable'   => $publicly_queryable,
+            'show_ui'              => true,
+            'show_in_nav_menus'    => false,
+            'show_in_menu'         => true,
+            'show_in_admin_bar'    => true,
+            'menu_icon'            => $this->post_type_menu_icon,
+            'hierarchical'         => false,
+            'supports'             => [
+                'title',
+                'editor',
+                'thumbnail',
+                /*'code_editor'*/
+            ],
+            /** @see ContentBlock::meta_box() */
+            'register_meta_box_cb' => [$this, 'meta_box'],
+            'has_archive'          => false
+        ]);
 
-		register_post_type( $this->post_type_slug, [
-			'label'                => __( 'Content Blocks', 'block' ),
-			'labels'               => [
-				'name'               => __( 'Content Blocks', 'block' ),
-				'singular_name'      => $this->post_type_label,
-				'menu_name'          => __( 'Content Blocks', 'block' ),
-				'name_admin_bar'     => $this->post_type_label,
-				'all_items'          => __( 'All blocks', 'block' ),
-				'add_new'            => __( 'Add block', 'block' ),
-				'add_new_item'       => __( 'Add new block', 'block' ),
-				'edit_item'          => __( 'Edit block', 'block' ),
-				'new_item'           => __( 'New block', 'block' ),
-				'view_item'          => __( 'View block', 'block' ),
-				'search_items'       => __( 'Search block', 'block' ),
-				'not_found'          => __( 'No blocks found', 'block' ),
-				'not_found_in_trash' => __( 'No blocks found in the Trash', 'block' ),
-				'parent_item_colon'  => __( 'Parent block', 'block' )
-			],
-			'public'               => $publicly_queryable,
-			'exclude_from_search'  => true,
-			'publicly_queryable'   => $publicly_queryable,
-			'show_ui'              => true,
-			'show_in_nav_menus'    => false,
-			'show_in_menu'         => true,
-			'show_in_admin_bar'    => true,
-			'menu_icon'            => $this->post_type_menu_icon,
-			'hierarchical'         => false,
-			'supports'             => [
-				'title',
-				/*'editor',*/
-				'thumbnail',
-				'code_editor',
-			],                         /** @see ContentBlock::meta_box() */
-			'register_meta_box_cb' => [$this, 'meta_box'],
-			'has_archive'          => false
-		] );
+        flush_rewrite_rules();
 
-		flush_rewrite_rules();
+        $args = [
+            'post_type'   => $this->post_type_slug,
+            'post_status' => 'any',
+            'nopaging'    => true
+        ];
 
-		$args = [
-			'post_type'   => $this->post_type_slug,
-			'post_status' => 'any',
-			'nopaging'    => true
-		];
-
-		$content_blocks = get_posts( $args );
-		foreach ( $content_blocks as $content_block ) {
-			if ( trim( $content_block->post_title ) == '' ) {
-				$new_content_block_values = [
-					'ID'         => $content_block->ID,
-					'post_title' => __( 'Content Block', 'block' ) . ' ' . $content_block->ID
-				];
-				wp_update_post( $new_content_block_values );
-			}
-		}
-	}
-
-	/**
-	 * Get list
-	 *
-	 * @return void
-	 */
-	public function get_list(){
-		$args = [
-			'post_type'   => $this->post_type_slug,
-			'post_status' => 'publish',
-			'nopaging'    => true
-		];
-
-		$content_blocks = get_posts( $args );
-		$this->content_block_list = [];
-
-		foreach ( $content_blocks as $content_block ) {
-			$this->content_block_list[ $content_block->ID ]                = $content_block->post_title;
-			$this->content_block_slug_list[ $content_block->ID ]           = $content_block->post_name;
-			$this->content_block_list_by_slug[ $content_block->post_name ] = $content_block->ID;
-		}
+        $content_blocks = get_posts($args);
+        foreach ($content_blocks as $content_block) {
+            if (trim($content_block->post_title) == '') {
+                $new_content_block_values = [
+                    'ID'         => $content_block->ID,
+                    'post_title' => __('Content Block', 'block').' '
+                        .$content_block->ID
+                ];
+                wp_update_post($new_content_block_values);
+            }
+        }
     }
 
-	public function get_para_list(){
-		$this->para_list        = [
-			'none'                     => __('No Paragraph Tags / Run Shortcodes', 'block'),
-			'no-shortcodes'            => __('No Paragraph Tags / No Shortcodes', 'block'),
-			'paragraphs'               => __('Add Paragraph Tags / Run Shortcodes', 'block'),
-			'paragraphs-no-shortcodes' => __('Add Paragraph Tags / No Shortcodes', 'block'),
-			'full'                     => __('Full Content Filtering', 'block'),
-		];
-	}
+    public function register_widget()
+    {
+        register_widget(ContentBlockWidget::class);
+    }
 
-	public function register_widget() {
-		register_widget( ContentBlockWidget::class );
-	}
+    public function do_wp_head()
+    {
+        $this->page_title = get_the_title();
+    }
 
-	public function do_wp_head() {
+    public function enqueue_scripts()
+    {
+        wp_enqueue_script('jquery-ui-dialog', ['jquery', 'jquery-ui-core']);
+        wp_enqueue_style('wp-jquery-ui-dialog');
+    }
 
-		$this->page_title = get_the_title();
-	}
-
-	public function enqueue_scripts() {
-		wp_enqueue_script( 'jquery-ui-dialog', ['jquery','jquery-ui-core'] );
-		wp_enqueue_style( 'wp-jquery-ui-dialog' );
-	}
-
-	public function reorder_list( $query ) {
+    public function reorder_list($query)
+    {
         if ($query->is_admin) {
             if ($query->get('post_type') == $this->post_type_slug) {
                 $query->set('orderby', 'post_title');
@@ -264,418 +250,437 @@ class ContentBlock {
             }
         }
 
-		return $query;
-	}
+        return $query;
+    }
 
-	/**
-	 * @return array
-	 */
-	public function set_column_titles(): array {
-		return [
-			'cb'                                => '<input type="checkbox"/>',
-			'title'                             => __( 'Title', 'block' ),
-			$this->post_type_slug . 'shortcode' => __( 'Shortcode', 'block' ),
-			'date'                              => __( 'Date', 'block' )
-		];
-	}
+    /**
+     * @return array
+     */
+    public function set_column_titles(): array
+    {
+        return [
+            'cb'                              => '<input type="checkbox"/>',
+            'title'                           => __('Title', 'block'),
+            $this->post_type_slug.'shortcode' => __('Shortcode', 'block'),
+            'date'                            => __('Date', 'block')
+        ];
+    }
 
-	/**
-	 * @param $column
-	 * @param $post_id
-	 *
-	 * @return void
-	 */
-	public function set_columns( $column, $post_id ): void {
-		$post = WP_Post::get_instance($post_id);
-		switch ( $column ) {
-			case $this->post_type_slug . 'shortcode' :
-				echo '<input type="text" class="cb_read_only_input" value="' .
-				     esc_attr( '[' . $this->post_type_shortcode . ' slug="' . $post->post_name . '"]' ) . '" />';
-				break;
-			default :
-				break;
-		}
+    /**
+     * @param $column
+     * @param $post_id
+     *
+     * @return void
+     */
+    public function set_columns($column, $post_id): void
+    {
+        $post = WP_Post::get_instance($post_id);
+        switch ($column) {
+            case $this->post_type_slug.'shortcode' :
+                echo '<input type="text" class="cb_read_only_input" value="'.
+                    esc_attr('['.$this->post_type_shortcode.' slug="'
+                        .$post->post_name.'"]').'" />';
+                break;
+            default :
+                break;
+        }
+    }
 
-	}
+    public function change_title_text($title)
+    {
+        if ($this->post_type_slug === get_post_type()) {
+            return __('Enter block title', 'block');
+        }
+        return $title;
+    }
 
+    /**
+     * @param  WP_Post  $post
+     *
+     * @return void
+     */
+    public function meta_box($post)
+    {
+        $this->post = $post;
+        add_meta_box($post->ID, __('Block usage', 'block'),
+            [$this, 'meta_box_screen'], $this->post_type_slug, 'side',
+            'default');
+        //add_meta_box( 'editor', 'Content', [$this, 'editor_content'], $this->post_type_slug, 'normal', 'default');
+    }
 
-	public function change_title_text( $title ) {
-        if ( $this->post_type_slug === get_post_type() ) {
-            return __( 'Enter block title', 'block' );
-		}
-		return $title;
-	}
+    public function meta_box_screen($post)
+    {
+        $code = [];
 
-	/**
-	 * @param WP_Post $post
-	 *
-	 * @return void
-	 */
-	public function meta_box( $post ) {
-		$this->post = $post;
-		add_meta_box( $post->ID, __( 'Block usage', 'block' ), [$this, 'meta_box_screen'], $this->post_type_slug, 'side', 'default' );
-		//add_meta_box( 'editor', 'Content', [$this, 'editor_content'], $this->post_type_slug, 'normal', 'default');
-	}
-
-
-
-	public function is_edit_page( $new_edit = null ) {
-		global $pagenow;
-		if ( ! is_admin() ) {
-			return false;
-		}
-
-		if ( $new_edit == "edit" ) {
-			return $pagenow == 'post.php';
-		} elseif ( $new_edit == "new" ) {
-			return $pagenow == 'post-new.php';
-		} else {
-			return in_array( $pagenow, [
-				'post.php',
-				'post-new.php'
-			] );
-		}
-	}
-
-	public function meta_box_screen( $post ) {
-
-		$code = [];
-
-		if ( $this->is_edit_page( 'edit' ) ) {
-			$post_id    = $post->ID;
-			$post_slug  = $post->post_name;
-			$code[]  = '[' . $this->post_type_shortcode . ' id="' . $post_id . '"]';
-			$code[]  = '[' . $this->post_type_shortcode . ' slug="' . $post_slug . '"]';
-		} else {
-			$code[] = __( 'New block', 'block' );
-		}
-
-		$access            = array(
-			__( 'Shortcode', 'block' ),
-			__( 'PHP', 'block' )
-		);
-		$methods           = array(
-			__( 'ID', 'block' ),
-			__( 'Slug', 'block' )
-		);
-		$para_descriptions = array(
-			__( 'No Paragraph Tags / Run Shortcodes', 'block' ),
-			__( 'No Paragraph Tags / No Shortcodes', 'block' ),
-			__( 'Add Paragraph Tags / Run Shortcodes', 'block' ),
-			__( 'Add Paragraph Tags / No Shortcodes', 'block' ),
-			__( 'Full Content Filtering', 'block' )
-		);
-
-		if ( $code ) {
-			echo '<div class="cb_meta">';
-			foreach ( $code as $cod ) {
-				echo '<div class="cb_meta_field" style="display: grid; margin: 10px 0;">
-			        <input type="text" class="cb_read_only_input" id="' . esc_attr( $this->option_prefix . 'access_' . $cod ) . '" value="' . esc_attr( $cod ) . '" />
-                </div>';
-			}
-			echo '</div>';
-		} else {
-			echo __('Save block before to use it', 'block');
-		}
-
-	}
-
-	public function do_the_content( $content ) {
-
-		if ( get_post_type() == $this->post_type_slug ) {
-			if ( class_exists( 'Vc_Base' ) ) {
-				$vc = new Vc_Base;
-				$vc->addFrontCss();
-			}
-		}
-
-		if ( get_post_type() == $this->post_type_slug ) {
-			if ( class_exists( 'SiteOrigin_Panels' ) ) {
-				$renderer = SiteOrigin_Panels::renderer();
-				$renderer->add_inline_css( get_the_ID(), $renderer->generate_css( get_the_ID() ) );
-			}
-		}
-
-		return $content;
-	}
-
-	public function get_content( $id, $para = false ) {
-		global $wp_query;
-
-		if ( in_array( $id, $this->circular_block_tracker ) ) {
-			return '';
-		}
-
-		$this->circular_block_tracker[] = $id;
-
-		$post_content = '';
-
-		switch ( $para ) {
-
-			case 'full':
-
-				$args = array(
-					'p'           => $id,
-					'post_type'   => $this->post_type_slug,
-					'post_status' => 'publish',
-					'nopaging'    => true
-				);
-
-				if ( class_exists( 'FLBuilder' ) ) {
-					ob_start();
-					FLBuilder::render_query( $args );
-					$post_content = ob_get_clean();
-				} else {
-					$the_query = new WP_Query( $args );
-
-					$original_query = false;
-
-					if ( class_exists( 'Vc_Base' ) && ( ! is_singular() ) ) {
-						$original_query = $wp_query;
-						$wp_query       = $the_query;
-					}
-
-					if ( $the_query->have_posts() ) {
-						while ( $the_query->have_posts() ) {
-							$the_query->the_post();
-							$post_content = apply_filters( 'the_content', get_the_content() );
-							break;
-						}
-					}
-
-					if ( is_object( $original_query ) ) {
-						if ( get_class( $original_query ) == 'WP_Query' ) {
-							$wp_query = $original_query;
-						}
-					}
-
-					wp_reset_postdata();
-				}
-
-				break;
-
-			default:
-				$args       = array(
-					'p'           => $id,
-					'post_type'   => $this->post_type_slug,
-					'post_status' => 'publish',
-					'nopaging'    => true
-				);
-				$block_post = get_posts( $args );
-
-				if ( count( $block_post ) > 0 ) {
-					switch ( $para ) {
-
-						case 'paragraphs':
-							$post_content = do_shortcode( wpautop( $block_post[ 0 ]->post_content ) );
-							break;
-
-						case 'paragraphs-no-shortcodes':
-							$post_content = wpautop( $block_post[ 0 ]->post_content );
-							break;
-
-						case 'no-shortcodes':
-							$post_content = $block_post[ 0 ]->post_content;
-							break;
-
-						default:
-							$post_content = do_shortcode( $block_post[ 0 ]->post_content );
-							break;
-
-					}
-				}
-
-				break;
-		}
-
-		foreach ( array_keys( $this->circular_block_tracker, $id ) as $key ) {
-			unset( $this->circular_block_tracker[ $key ] );
-		}
-
-		return $post_content;
-	}
-
-	/**
-	 * @param bool $id
-	 * @param bool $para
-	 * @param array $vars
-	 *
-	 * @return mixed|string|void
-	 */
-	public function get_block_by_id( $id = false, $para = false, $vars = array() ) {
-		$html = '';
-		$id   = $this->get_clean_id( $id );
-		$para = $this->get_clean_para( $para );
-
-		if ( is_array( $vars ) ) {
-			foreach ( $vars as $key => $value ) {
-				$key = trim( strtolower( $key ) );
-				if ( ( substr( $key, 0, 3 ) == 'var' ) && ( strlen( $key ) > 3 ) ) {
-					if ( preg_match( '/^[a-z0-9]+$/', $key ) === 1 ) {
-						$this->var_values[ $key ] = str_replace( "\\\"", "\"", $value );
-					}
-				}
-			}
-		}
-
-		if ( $id !== false ) {
-			$html = $this->get_content( $id, $para );
-		}
-
-		return $html;
-	}
-
-	public function get_block_by_slug( $slug = false, $vars = array() ) {
-		$html = '';
-
-		$slug = $this->get_clean_slug( $slug );
-
-		if ( is_array( $vars ) ) {
-			foreach ( $vars as $key => $value ) {
-				$key = trim( strtolower( $key ) );
-				if ( ( substr( $key, 0, 3 ) == 'var' ) && ( strlen( $key ) > 3 ) ) {
-					if ( preg_match( '/^[a-z0-9]+$/', $key ) === 1 ) {
-						$this->var_values[ $key ] = str_replace( "\\\"", "\"", $value );
-					}
-				}
-			}
-		}
-
-		if ( $slug !== false ) {
-			$html = $this->get_content( $this->content_block_list_by_slug[ $slug ] );
-		}
-
-		return $html;
-	}
-
-	public function get_clean_id( $id = false ) {
-        if ( is_numeric($id) && isset( $this->content_block_list[ $id ] ) ) {
-            return intval( $id );
+        if ($this->is_edit_page('edit')) {
+            $post_id = $post->ID;
+            $post_slug = $post->post_name;
+            $code[] = '['.$this->post_type_shortcode.' id="'.$post_id.'"]';
+            $code[] = '['.$this->post_type_shortcode.' slug="'.$post_slug.'"]';
+        } else {
+            $code['new'] = __('New block', 'block');
         }
 
-		return false;
-	}
+        if (!isset($code['new'])) {
+            echo '<div class="cb_meta">';
+            foreach ($code as $cod) {
+                echo '<div class="cb_meta_field" style="display: grid; margin: 10px 0;">
+			        <input type="text" class="cb_read_only_input" id="'
+                    .esc_attr($this->option_prefix.'access_'.$cod).'" value="'
+                    .esc_attr($cod).'" />
+                </div>';
+            }
+            echo '</div>';
+        } else {
+            _e('Save block before to use it', 'block');
+        }
+    }
 
-	public function get_clean_slug( $slug = '' ) {
-		$slug = trim( strval( $slug ) );
-		if ( $slug != '' ) {
-			if ( isset( $this->content_block_list_by_slug[ $slug ] ) ) {
-				return $slug;
-			}
-		}
+    public function is_edit_page($new_edit = null)
+    {
+        global $pagenow;
+        if (!is_admin()) {
+            return false;
+        }
 
-		return false;
-	}
+        if ($new_edit == "edit") {
+            return $pagenow == 'post.php';
+        } elseif ($new_edit == "new") {
+            return $pagenow == 'post-new.php';
+        } else {
+            return in_array($pagenow, [
+                'post.php',
+                'post-new.php'
+            ]);
+        }
+    }
 
-	public function get_clean_para( $para = '' ) {
-		if ( $para === false ) {
-			return '';
-		} elseif ( $para === true ) {
-			return 'full';
-		} else {
-			$para = strtolower( trim( strval( $para ) ) );
-			if ( in_array( $para, array(
-				'',
-				'no-shortcodes',
-				'yes',
-				'full',
-				'paragraphs',
-				'paragraphs-no-shortcodes'
-			) ) ) {
-				if ( $para == 'yes' ) {
-					$para = 'full';
-				}
+    public function do_the_content($content)
+    {
+        if (get_post_type() == $this->post_type_slug) {
+            if (class_exists('Vc_Base')) {
+                $vc = new \Vc_Base();
+                $vc->addFrontCss();
+            }
+        }
 
-				return $para;
-			}
-		}
+        if (get_post_type() == $this->post_type_slug) {
+            if (class_exists('SiteOrigin_Panels')) {
+                $renderer = \SiteOrigin_Panels::renderer();
+                $renderer->add_inline_css(get_the_ID(),
+                    $renderer->generate_css(get_the_ID()));
+            }
+        }
 
-		return '';
-	}
+        return $content;
+    }
 
-	public function content_block_shortcode( $atts ) {
+    public function content_block_shortcode($atts)
+    {
+        $html = '';
 
-		$html = '';
-
-		foreach ( $atts as $key => $value ) {
-			$key = trim( strtolower( $key ) );
-			if ( ( substr( $key, 0, 3 ) == 'var' ) && ( strlen( $key ) > 3 ) ) {
-				if ( preg_match( '/^[a-z0-9]+$/', $key ) === 1 ) {
-					$this->var_values[ $key ] = str_replace( "\\\"", "\"", $value );
-				}
-			}
-		}
-
-
-		if ( isset( $atts[ 'id' ] ) ) {
-			$html = $this->get_block_by_id( $atts[ 'id' ] );
-		} elseif ( isset( $atts[ 'slug' ] ) ) {
-			$html = $this->get_block_by_slug( $atts[ 'slug' ] );
-		} elseif ( isset( $atts[ 'getvar' ] ) ) {
-			$var = trim( strtolower( $atts[ 'getvar' ] ) );
-			if ( ( substr( $var, 0, 3 ) == 'var' ) && ( strlen( $var ) > 3 ) ) {
-				if ( preg_match( '/^[a-z0-9-_]+$/', $var ) === 1 ) {
-					if ( isset( $this->var_values[ $var ] ) ) {
-						$html = esc_html( $this->var_values[ $var ] );
-					}
-				}
-			}
-		} elseif ( isset( $atts[ 'datetime' ] ) ) {
-			if ( $datetime = date( $atts[ 'datetime' ] ) ) {
-				$html = esc_html( $datetime );
-			}
-		} elseif ( isset( $atts[ 'info' ] ) ) {
-			$info = strtolower( trim( strval( $atts[ 'info' ] ) ) );
-			switch ( $info ) {
-				case 'site-title':
-					$html = esc_html( get_bloginfo( 'name' ) );
-					break;
-				case 'page-title':
-					$html = esc_html( $this->page_title );
-					break;
-			}
-		}
-
-		return $html;
-	}
+        foreach ($atts as $key => $value) {
+            $key = trim(strtolower($key));
+            if ((substr($key, 0, 3) == 'var') && (strlen($key) > 3)) {
+                if (preg_match('/^[a-z0-9]+$/', $key) === 1) {
+                    $this->var_values[$key] = str_replace("\\\"", "\"", $value);
+                }
+            }
+        }
 
 
+        if (isset($atts['id'])) {
+            $html = $this->get_block_by_id($atts['id']);
+        } elseif (isset($atts['slug'])) {
+            $html = $this->get_block_by_slug($atts['slug']);
+        } elseif (isset($atts['getvar'])) {
+            $var = trim(strtolower($atts['getvar']));
+            if ((substr($var, 0, 3) == 'var') && (strlen($var) > 3)) {
+                if (preg_match('/^[a-z0-9-_]+$/', $var) === 1) {
+                    if (isset($this->var_values[$var])) {
+                        $html = esc_html($this->var_values[$var]);
+                    }
+                }
+            }
+        } elseif (isset($atts['datetime'])) {
+            if ($datetime = date($atts['datetime'])) {
+                $html = esc_html($datetime);
+            }
+        } elseif (isset($atts['info'])) {
+            $info = strtolower(trim(strval($atts['info'])));
+            switch ($info) {
+                case 'site-title':
+                    $html = esc_html(get_bloginfo('name'));
+                    break;
+                case 'page-title':
+                    $html = esc_html($this->page_title);
+                    break;
+            }
+        }
 
-	// Element Mapping
-	public function integrateWithVC() {
-		// Check if WPBakery Page Builder is installed
-		if ( ! defined( 'WPB_VC_VERSION' ) ) {
-			// Display notice that Extend WPBakery Page Builder is required
-			// add_action('admin_notices',  [$this, 'showVcVersionNotice']);
-			return;
-		}
+        return $html;
+    }
 
-		vc_map( array(
-			"name" => __("Content block", 'block'),
-			"description" => __("Add content block", 'block'),
-			"base" => $this->post_type_shortcode,
-			"class" => $this->post_type_shortcode,
-			"controls" => "full",
-			"icon" => defined('WPB_PLUGIN_URL') ? WPB_PLUGIN_URL . 'assets/img/icon.png' : '',
-			"category" => __('Content', 'js_composer'),
-			"params" => array(
-				array(
-					"type" => "dropdown",
-					"holder" => "div",
-					"heading" => __("Select Content Block by slug", 'block'),
-					"param_name" => "slug",
-					"value" => $this->content_block_slug_list,
-					"description" => __("Select content block to insert on this page", 'block')
-				),
-			)
-		) );
-	}
-	// Show notice if your plugin is activated but Visual Composer is not
-	public function showVcVersionNotice() {
-		echo '
+    /**
+     * @param  bool  $id
+     * @param  bool  $para
+     * @param  array  $vars
+     *
+     * @return mixed|string|void
+     */
+    public function get_block_by_id($id = false, $para = false, $vars = array())
+    {
+        $html = '';
+        $id = $this->get_clean_id($id);
+        $para = $this->get_clean_para($para);
+
+        if (is_array($vars)) {
+            foreach ($vars as $key => $value) {
+                $key = trim(strtolower($key));
+                if ((substr($key, 0, 3) == 'var') && (strlen($key) > 3)) {
+                    if (preg_match('/^[a-z0-9]+$/', $key) === 1) {
+                        $this->var_values[$key] = str_replace("\\\"", "\"",
+                            $value);
+                    }
+                }
+            }
+        }
+
+        if ($id !== false) {
+            $html = $this->get_content($id, $para);
+        }
+
+        return $html;
+    }
+
+    public function get_clean_id($id = false)
+    {
+        if (is_numeric($id) && isset($this->content_block_list[$id])) {
+            return intval($id);
+        }
+
+        return false;
+    }
+
+    public function get_clean_para($para = '')
+    {
+        if ($para === false) {
+            return '';
+        } elseif ($para === true) {
+            return 'full';
+        } else {
+            $para = strtolower(trim(strval($para)));
+            if (in_array($para, array(
+                '',
+                'no-shortcodes',
+                'yes',
+                'full',
+                'paragraphs',
+                'paragraphs-no-shortcodes'
+            ))
+            ) {
+                if ($para == 'yes') {
+                    $para = 'full';
+                }
+
+                return $para;
+            }
+        }
+
+        return '';
+    }
+
+    public function get_content($id, $para = false)
+    {
+        global $wp_query;
+
+        if (in_array($id, $this->circular_block_tracker)) {
+            return '';
+        }
+
+        $this->circular_block_tracker[] = $id;
+
+        $post_content = '';
+
+        switch ($para) {
+            case 'full':
+
+                $args = array(
+                    'p'           => $id,
+                    'post_type'   => $this->post_type_slug,
+                    'post_status' => 'publish',
+                    'nopaging'    => true
+                );
+
+                if (class_exists('FLBuilder')) {
+                    ob_start();
+                    \FLBuilder::render_query($args);
+                    $post_content = ob_get_clean();
+                } else {
+                    $the_query = new \WP_Query($args);
+
+                    $original_query = false;
+
+                    if (class_exists('Vc_Base') && (!is_singular())) {
+                        $original_query = $wp_query;
+                        $wp_query = $the_query;
+                    }
+
+                    if ($the_query->have_posts()) {
+                        while ($the_query->have_posts()) {
+                            $the_query->the_post();
+                            $post_content = apply_filters('the_content',
+                                get_the_content());
+                            break;
+                        }
+                    }
+
+                    if (is_object($original_query)) {
+                        if (get_class($original_query) == 'WP_Query') {
+                            $wp_query = $original_query;
+                        }
+                    }
+
+                    wp_reset_postdata();
+                }
+
+                break;
+
+            default:
+                $args = array(
+                    'p'           => $id,
+                    'post_type'   => $this->post_type_slug,
+                    'post_status' => 'publish',
+                    'nopaging'    => true
+                );
+                $block_post = get_posts($args);
+
+                if (count($block_post) > 0) {
+                    switch ($para) {
+                        case 'paragraphs':
+                            $post_content
+                                = do_shortcode(wpautop($block_post[0]->post_content));
+                            break;
+
+                        case 'paragraphs-no-shortcodes':
+                            $post_content
+                                = wpautop($block_post[0]->post_content);
+                            break;
+
+                        case 'no-shortcodes':
+                            $post_content = $block_post[0]->post_content;
+                            break;
+
+                        default:
+                            $post_content
+                                = do_shortcode($block_post[0]->post_content);
+                            break;
+                    }
+                }
+
+                break;
+        }
+
+        foreach (array_keys($this->circular_block_tracker, $id) as $key) {
+            unset($this->circular_block_tracker[$key]);
+        }
+
+        return $post_content;
+    }
+
+    public function get_block_by_slug($slug = false, $vars = array())
+    {
+        $html = '';
+
+        $slug = $this->get_clean_slug($slug);
+
+        if (is_array($vars)) {
+            foreach ($vars as $key => $value) {
+                $key = trim(strtolower($key));
+                if ((substr($key, 0, 3) == 'var') && (strlen($key) > 3)) {
+                    if (preg_match('/^[a-z0-9]+$/', $key) === 1) {
+                        $this->var_values[$key] = str_replace("\\\"", "\"",
+                            $value);
+                    }
+                }
+            }
+        }
+
+        if ($slug !== false) {
+            $html
+                = $this->get_content($this->content_block_list_by_slug[$slug]);
+        }
+
+        return $html;
+    }
+
+    public function get_clean_slug($slug = '')
+    {
+        $slug = trim(strval($slug));
+        if ($slug != '') {
+            if (isset($this->content_block_list_by_slug[$slug])) {
+                return $slug;
+            }
+        }
+
+        return false;
+    }
+
+
+    // Element Mapping
+
+    public function integrateWithVC()
+    {
+        // Check if WPBakery Page Builder is installed
+        if (!defined('WPB_VC_VERSION') ||
+            !defined('WPB_PLUGIN_URL')) {
+            // Display notice that Extend WPBakery Page Builder is required
+            // add_action('admin_notices',  [$this, 'showVcVersionNotice']);
+            return;
+        }
+
+        vc_map(array(
+            "name"        => __("Content block", 'block'),
+            "description" => __("Add content block", 'block'),
+            "base"        => $this->post_type_shortcode,
+            "class"       => $this->post_type_shortcode,
+            "controls"    => "full",
+            "icon"        => WPB_PLUGIN_URL.'assets/img/icon.png',
+            "category"    => __('Content', 'js_composer'),
+            "params"      => array(
+                array(
+                    "type"        => "dropdown",
+                    "holder"      => "div",
+                    "heading"     => __("Select Content Block by slug",
+                        'block'),
+                    "param_name"  => "slug",
+                    "value"       => $this->content_block_slug_list,
+                    "description" => __("Select content block to insert on this page",
+                        'block')
+                ),
+            )
+        ));
+    }
+
+    // Show notice if your plugin is activated but Visual Composer is not
+    public function showVcVersionNotice()
+    {
+        echo '
         <div class="updated">
-          <p>'.sprintf(__('<strong>%s</strong> requires <strong><a href="http://bit.ly/vcomposer" target="_blank">WPBakery Page builder</a></strong> plugin to be installed and activated on your site.', 'block'), $this->post_type_slug).'</p>
+          <p>'
+            .sprintf(__('<strong>%s</strong> requires <strong><a href="http://bit.ly/vcomposer" target="_blank">WPBakery Page builder</a></strong> plugin to be installed and activated on your site.',
+                'block'), $this->post_type_slug).'</p>
         </div>';
-	}
+    }
 
+
+    public static function plugin_activate()
+    {
+        flush_rewrite_rules();
+    }
+
+    public static function plugin_deactivate()
+    {
+        flush_rewrite_rules();
+    }
 }
