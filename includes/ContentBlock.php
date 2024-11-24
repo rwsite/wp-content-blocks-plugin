@@ -115,8 +115,10 @@ final class ContentBlock
      */
     public function add_actions()
     {
+	    add_action('init', fn() =>
         load_plugin_textdomain('block', false,
-            dirname(plugin_basename($this->plugin_file)).'/languages/');
+            dirname(plugin_basename($this->plugin_file)).'/languages')
+	    ,9);
 
         add_action('init', [$this, 'register_post']);
         add_action('widgets_init', [$this, 'register_widget']);
