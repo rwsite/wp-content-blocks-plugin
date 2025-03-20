@@ -2,8 +2,8 @@
 /**
  * Plugin Name: Content Blocks
  * Plugin URI:  http://rwsite.ru
- * Description: Repeatable Content Blocks plugin
- * Version:     1.0.0
+ * Description: Repeatable Content Blocks for WordPress. For using Visual page builder. Alternative of wordpress widgets.
+ * Version:     1.2.0
  * Text Domain: content_block
  * Domain Path: /languages
  * Author:      Aleksey Tikhomirov
@@ -21,5 +21,5 @@ require_once 'includes/ContentBlockWidget.php';
 $plugin = ContentBlock::get_Instance(__FILE__);
 $plugin->add_actions();
 
-register_activation_hook( __FILE__, [$plugin, 'plugin_activate'] );
-register_deactivation_hook( __FILE__, [$plugin, 'plugin_deactivate'] );
+register_activation_hook(__FILE__, [$plugin, 'plugin_activate']);
+register_deactivation_hook(__FILE__, [$plugin, 'plugin_deactivate']);

@@ -5,7 +5,11 @@
 
 namespace content_block;
 
+use FLBuilder;
+use SiteOrigin_Panels;
+use Vc_Base;
 use WP_Post;
+use WP_Query;
 
 final class ContentBlock
 {
@@ -66,7 +70,6 @@ final class ContentBlock
         $this->plugin_url = plugin_dir_url($this->plugin_file);
         $this->plugin_basename = plugin_basename($this->plugin_file);
         $this->get_list();
-        $this->get_para_list();
     }
 
     /**
@@ -117,8 +120,8 @@ final class ContentBlock
     {
         add_action('init',
             fn() => load_plugin_textdomain('content_block', false,
-                dirname(plugin_basename($this->plugin_file)).'/languages')
-        , 9);
+                dirname(plugin_basename($this->plugin_file)).'/languages/')
+        ,2 );
 
         add_action('init', [$this, 'register_post'], 99);
         add_action('widgets_init', [$this, 'register_widget'], 99);
@@ -137,16 +140,6 @@ final class ContentBlock
 
         // We safely integrate with VC with this hook
         add_action('init', [$this, 'integrateWithVC']);
-
-        add_action('setup_theme', [$this, 'register_theme_feature'], 10, 2);
-    }
-
-    public function register_theme_feature()
-    {
-        register_theme_feature('code_editor', [
-            'description'  => __('PHP code editor', 'content_block'),
-            'show_in_rest' => false,
-        ]);
     }
 
     /**
@@ -154,6 +147,8 @@ final class ContentBlock
      */
     public function register_post()
     {
+        $this->get_para_list();
+
         $this->plugin_name = __('Content Block', 'content_block');
         $this->post_type_label = __('Content Block', 'content_block');
         $this->post_type_labels = __('Blocks', 'content_block');
@@ -360,14 +355,14 @@ final class ContentBlock
     {
         if (get_post_type() == $this->post_type_slug) {
             if (class_exists('Vc_Base')) {
-                $vc = new \Vc_Base();
+                $vc = new Vc_Base();
                 $vc->addFrontCss();
             }
         }
 
         if (get_post_type() == $this->post_type_slug) {
             if (class_exists('SiteOrigin_Panels')) {
-                $renderer = \SiteOrigin_Panels::renderer();
+                $renderer = SiteOrigin_Panels::renderer();
                 $renderer->add_inline_css(get_the_ID(),
                     $renderer->generate_css(get_the_ID()));
             }
@@ -515,10 +510,10 @@ final class ContentBlock
 
                 if (class_exists('FLBuilder')) {
                     ob_start();
-                    \FLBuilder::render_query($args);
+                    FLBuilder::render_query($args);
                     $post_content = ob_get_clean();
                 } else {
-                    $the_query = new \WP_Query($args);
+                    $the_query = new WP_Query($args);
 
                     $original_query = false;
 
