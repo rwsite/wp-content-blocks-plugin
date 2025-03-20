@@ -19,12 +19,11 @@ class ContentBlockWidget extends \WP_Widget
         $widget_ops = [
             'classname'                   => 'block_meta',
             'description'                 => __('Place a content/text block in the selected area.',
-                'block'),
+                'content_block'),
             'customize_selective_refresh' => true,
             'show_instance_in_rest'       => true,
         ];
-        parent::__construct('wp_block', __('Content Block', 'block'),
-            $widget_ops);
+        parent::__construct('wp_block', __('Content Block', 'content_block'), $widget_ops);
     }
 
     /**
@@ -93,7 +92,7 @@ class ContentBlockWidget extends \WP_Widget
 
         echo '<p>';
         echo '<label for="'.$this->get_field_id('title').'">'
-            .esc_html(__('Title:', 'block')).'</label>';
+            .esc_html(__('Title:', 'content_block')).'</label>';
         echo '<input class="widefat" id="'.$this->get_field_id('title')
             .'" name="'.$this->get_field_name('title').'" type="text" value="'
             .esc_attr($title).'" />';
@@ -101,7 +100,7 @@ class ContentBlockWidget extends \WP_Widget
         echo '<p>';
 
         echo '<label for="'.$this->get_field_id('cbid').'">'
-            .esc_html(__('Content Block:', 'block')).'</label>';
+            .esc_html(__('Content Block:', 'content_block')).'</label>';
 
         echo '<select class="widefat" id="'.$this->get_field_id('cbid')
             .'" name="'.$this->get_field_name('cbid').'">';

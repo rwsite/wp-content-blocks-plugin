@@ -1,0 +1,178 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Content Blocks\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2018-08-19 20:39+0000\n"
+"PO-Revision-Date: 2025-03-20 20:51+0000\n"
+"Last-Translator: bo3gyx <tech@rwsite.ru>\n"
+"Language-Team: Русский\n"
+"Language: ru_RU\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10 >= 2 && "
+"n%10<=4 &&(n%100<10||n%100 >= 20)? 1 : 2);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Loco https://localise.biz/"
+
+#: includes/ContentBlock.php:673
+#, php-format
+msgid ""
+"<strong>%s</strong> requires <strong><a href=\"http://bit.ly/vcomposer\" "
+"target=\"_blank\">WPBakery Page builder</a></strong> plugin to be installed "
+"and activated on your site."
+msgstr ""
+"<strong>%s</strong> требуется <strong><a href=\"http://bit.ly/vcomposer \" "
+"target=\"_blank\">WPBakery Page builder</a></strong> плагин, который будет "
+"установлен и активирован на вашем сайте."
+
+#: includes/ContentBlock.php:178
+msgid "Add block"
+msgstr "Добавить блок"
+
+#: includes/ContentBlock.php:646
+msgid "Add content block"
+msgstr "Добавить контент-блок"
+
+#: includes/ContentBlock.php:179
+msgid "Add new block"
+msgstr "Добавить новый блок"
+
+#: includes/ContentBlock.php:107
+msgid "Add Paragraph Tags / No Shortcodes"
+msgstr "Добавить теги абзаца / Без шорткодов"
+
+#: includes/ContentBlock.php:105
+msgid "Add Paragraph Tags / Run Shortcodes"
+msgstr "Добавлять теги абзацев / Запускать короткие коды"
+
+#. Author of the plugin
+msgid "Aleksey Tikhomirov"
+msgstr "Алексей Тихомиров"
+
+#: includes/ContentBlock.php:177
+msgid "All blocks"
+msgstr "Все блоки"
+
+#: includes/ContentBlock.php:307
+msgid "Block usage"
+msgstr "Использование блока"
+
+#: includes/ContentBlock.php:144
+msgid "Blocks"
+msgstr "Блоки"
+
+#: includes/ContentBlockWidget.php:26 includes/ContentBlock.php:142
+#: includes/ContentBlock.php:143 includes/ContentBlock.php:222
+msgid "Content Block"
+msgstr "Блок Контента"
+
+#: includes/ContentBlock.php:645
+msgid "Content block"
+msgstr "Контент блок"
+
+#: includes/ContentBlockWidget.php:104
+msgid "Content Block:"
+msgstr "Блок Контента:"
+
+#: includes/ContentBlock.php:171 includes/ContentBlock.php:173
+#: includes/ContentBlock.php:175
+msgid "Content Blocks"
+msgstr "Блоки Контента"
+
+#. Name of the plugin
+msgid "Content Blocks like [shortcodes]"
+msgstr "Блоки контента"
+
+#: includes/ContentBlock.php:267
+msgid "Date"
+msgstr "Дата"
+
+#: includes/ContentBlock.php:180
+msgid "Edit block"
+msgstr "Редактировать блок"
+
+#: includes/ContentBlock.php:294
+msgid "Enter block title"
+msgstr "Введите название блока"
+
+#: includes/ContentBlock.php:109
+msgid "Full Content Filtering"
+msgstr "Полная фильтрация контента"
+
+#. URI of the plugin
+#| msgid "http://rwsite.ru/"
+msgid "http://rwsite.ru"
+msgstr "https://rwsite.ru/"
+
+#. Author URI of the plugin
+#| msgid "https://rwsite.ru/"
+msgid "https://rwsite.ru"
+msgstr "https://rwsite.ru/"
+
+#: includes/ContentBlock.php:181 includes/ContentBlock.php:323
+msgid "New block"
+msgstr "Новый блок"
+
+#: includes/ContentBlock.php:184
+msgid "No blocks found"
+msgstr "Блоки не найдены"
+
+#: includes/ContentBlock.php:185
+msgid "No blocks found in the Trash"
+msgstr "В корзине пусто"
+
+#: includes/ContentBlock.php:103
+msgid "No Paragraph Tags / No Shortcodes"
+msgstr "Нет тегов абзаца / Нет коротких кодов"
+
+#: includes/ContentBlock.php:101
+msgid "No Paragraph Tags / Run Shortcodes"
+msgstr "Нет тегов абзаца / коротких кодов запуска"
+
+#: includes/ContentBlock.php:187
+msgid "Parent block"
+msgstr "Родительский блок"
+
+#: includes/ContentBlock.php:152
+msgid "PHP code editor"
+msgstr "Редактор PHP-кода"
+
+#: includes/ContentBlockWidget.php:21
+msgid "Place a content/text block in the selected area."
+msgstr "Поместите контент/текстовый блок в выбранную область."
+
+#. Description of the plugin
+msgid "Repeatable Content Blocks plugin"
+msgstr "Плагин повторяющихся контентных блоков"
+
+#: includes/ContentBlock.php:337
+msgid "Save block before to use it"
+msgstr "Сохраните блок, прежде чем использовать его"
+
+#: includes/ContentBlock.php:183
+msgid "Search block"
+msgstr "Блок поиска"
+
+#: includes/ContentBlock.php:656
+msgid "Select Content Block by slug"
+msgstr "Выберите Блок по slug"
+
+#: includes/ContentBlock.php:660
+msgid "Select content block to insert on this page"
+msgstr "Выберите Блок, что вы разместить его на странцие"
+
+#: includes/ContentBlock.php:266
+msgid "Shortcode"
+msgstr "Шорткод"
+
+#: includes/ContentBlock.php:265
+msgid "Title"
+msgstr "Название"
+
+#: includes/ContentBlockWidget.php:96
+msgid "Title:"
+msgstr "Название:"
+
+#: includes/ContentBlock.php:182
+msgid "View block"
+msgstr "Просмотр"

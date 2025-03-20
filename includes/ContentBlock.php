@@ -56,7 +56,7 @@ final class ContentBlock
         $this->option_prefix = $this->option_name;
         $this->form_element_prefix = 'cb-form-item-';
         $this->nonce_name = 'cb_nonce';
-        $this->post_type_slug = 'block';
+        $this->post_type_slug = 'content_block';
         $this->post_type_menu_icon = 'dashicons-screenoptions';
         $this->usage_about_page = 'cb_usage_about_page';
         $this->post_type_shortcode = $this->post_type_slug;
@@ -99,14 +99,14 @@ final class ContentBlock
     {
         $this->para_list = [
             'none'                     => __('No Paragraph Tags / Run Shortcodes',
-                'block'),
+                'content_block'),
             'no-shortcodes'            => __('No Paragraph Tags / No Shortcodes',
-                'block'),
+                'content_block'),
             'paragraphs'               => __('Add Paragraph Tags / Run Shortcodes',
-                'block'),
+                'content_block'),
             'paragraphs-no-shortcodes' => __('Add Paragraph Tags / No Shortcodes',
-                'block'),
-            'full'                     => __('Full Content Filtering', 'block'),
+                'content_block'),
+            'full'                     => __('Full Content Filtering', 'content_block'),
         ];
     }
 
@@ -115,13 +115,13 @@ final class ContentBlock
      */
     public function add_actions()
     {
-	    add_action('init', fn() =>
-        load_plugin_textdomain('block', false,
-            dirname(plugin_basename($this->plugin_file)).'/languages')
-	    ,9);
+        add_action('init',
+            fn() => load_plugin_textdomain('content_block', false,
+                dirname(plugin_basename($this->plugin_file)).'/languages')
+        , 9);
 
-        add_action('init', [$this, 'register_post']);
-        add_action('widgets_init', [$this, 'register_widget']);
+        add_action('init', [$this, 'register_post'], 99);
+        add_action('widgets_init', [$this, 'register_widget'], 99);
         add_action('wp_head', [$this, 'do_wp_head']);
         add_action('admin_enqueue_scripts', [$this, 'enqueue_scripts']);
         add_filter('pre_get_posts', [$this, 'reorder_list']);
@@ -131,17 +131,12 @@ final class ContentBlock
             [$this, 'set_columns'], 10, 2);
         add_filter('enter_title_here', [$this, 'change_title_text']);
 
-        add_shortcode($this->post_type_shortcode,
-            [$this, 'content_block_shortcode']);
+        add_shortcode($this->post_type_shortcode, [$this, 'content_block_shortcode']);
         add_filter('the_content', [$this, 'do_the_content']);
         add_action('wp_ajax_cb_hide_notice', [$this, 'hide_notice']);
 
         // We safely integrate with VC with this hook
         add_action('init', [$this, 'integrateWithVC']);
-
-        $this->plugin_name = __('Content Block', 'block');
-        $this->post_type_label = __('Content Block', 'block');
-        $this->post_type_labels = __('Blocks', 'block');
 
         add_action('setup_theme', [$this, 'register_theme_feature'], 10, 2);
     }
@@ -149,7 +144,7 @@ final class ContentBlock
     public function register_theme_feature()
     {
         register_theme_feature('code_editor', [
-            'description'  => __('PHP code editor', 'block'),
+            'description'  => __('PHP code editor', 'content_block'),
             'show_in_rest' => false,
         ]);
     }
@@ -159,6 +154,10 @@ final class ContentBlock
      */
     public function register_post()
     {
+        $this->plugin_name = __('Content Block', 'content_block');
+        $this->post_type_label = __('Content Block', 'content_block');
+        $this->post_type_labels = __('Blocks', 'content_block');
+
         $user = wp_get_current_user();
         $allowed_roles = [
             'editor',
@@ -168,23 +167,23 @@ final class ContentBlock
         $publicly_queryable = array_intersect($allowed_roles, $user->roles);
 
         register_post_type($this->post_type_slug, [
-            'label'                => __('Content Blocks', 'block'),
+            'label'                => __('Content Blocks', 'content_block'),
             'labels'               => [
-                'name'               => __('Content Blocks', 'block'),
+                'name'               => __('Content Blocks', 'content_block'),
                 'singular_name'      => $this->post_type_label,
-                'menu_name'          => __('Content Blocks', 'block'),
+                'menu_name'          => __('Content Blocks', 'content_block'),
                 'name_admin_bar'     => $this->post_type_label,
-                'all_items'          => __('All blocks', 'block'),
-                'add_new'            => __('Add block', 'block'),
-                'add_new_item'       => __('Add new block', 'block'),
-                'edit_item'          => __('Edit block', 'block'),
-                'new_item'           => __('New block', 'block'),
-                'view_item'          => __('View block', 'block'),
-                'search_items'       => __('Search block', 'block'),
-                'not_found'          => __('No blocks found', 'block'),
+                'all_items'          => __('All blocks', 'content_block'),
+                'add_new'            => __('Add block', 'content_block'),
+                'add_new_item'       => __('Add new block', 'content_block'),
+                'edit_item'          => __('Edit block', 'content_block'),
+                'new_item'           => __('New block', 'content_block'),
+                'view_item'          => __('View block', 'content_block'),
+                'search_items'       => __('Search block', 'content_block'),
+                'not_found'          => __('No blocks found', 'content_block'),
                 'not_found_in_trash' => __('No blocks found in the Trash',
-                    'block'),
-                'parent_item_colon'  => __('Parent block', 'block')
+                    'content_block'),
+                'parent_item_colon'  => __('Parent block', 'content_block')
             ],
             'public'               => $publicly_queryable,
             'exclude_from_search'  => true,
@@ -219,7 +218,7 @@ final class ContentBlock
             if (trim($content_block->post_title) == '') {
                 $new_content_block_values = [
                     'ID'         => $content_block->ID,
-                    'post_title' => __('Content Block', 'block').' '
+                    'post_title' => __('Content Block', 'content_block').' '
                         .$content_block->ID
                 ];
                 wp_update_post($new_content_block_values);
@@ -262,9 +261,9 @@ final class ContentBlock
     {
         return [
             'cb'                              => '<input type="checkbox"/>',
-            'title'                           => __('Title', 'block'),
-            $this->post_type_slug.'shortcode' => __('Shortcode', 'block'),
-            'date'                            => __('Date', 'block')
+            'title'                           => __('Title', 'content_block'),
+            $this->post_type_slug.'shortcode' => __('Shortcode', 'content_block'),
+            'date'                            => __('Date', 'content_block')
         ];
     }
 
@@ -291,7 +290,7 @@ final class ContentBlock
     public function change_title_text($title)
     {
         if ($this->post_type_slug === get_post_type()) {
-            return __('Enter block title', 'block');
+            return __('Enter block title', 'content_block');
         }
         return $title;
     }
@@ -304,7 +303,7 @@ final class ContentBlock
     public function meta_box($post)
     {
         $this->post = $post;
-        add_meta_box($post->ID, __('Block usage', 'block'),
+        add_meta_box($post->ID, __('Block usage', 'content_block'),
             [$this, 'meta_box_screen'], $this->post_type_slug, 'side',
             'default');
         //add_meta_box( 'editor', 'Content', [$this, 'editor_content'], $this->post_type_slug, 'normal', 'default');
@@ -320,7 +319,7 @@ final class ContentBlock
             $code[] = '['.$this->post_type_shortcode.' id="'.$post_id.'"]';
             $code[] = '['.$this->post_type_shortcode.' slug="'.$post_slug.'"]';
         } else {
-            $code['new'] = __('New block', 'block');
+            $code['new'] = __('New block', 'content_block');
         }
 
         if (!isset($code['new'])) {
@@ -334,7 +333,7 @@ final class ContentBlock
             }
             echo '</div>';
         } else {
-            _e('Save block before to use it', 'block');
+            _e('Save block before to use it', 'content_block');
         }
     }
 
@@ -642,23 +641,23 @@ final class ContentBlock
         }
 
         vc_map(array(
-            "name"        => __("Content block", 'block'),
-            "description" => __("Add content block", 'block'),
+            "name"        => __("Content block", 'content_block'),
+            "description" => __("Add content block", 'content_block'),
             "base"        => $this->post_type_shortcode,
             "class"       => $this->post_type_shortcode,
             "controls"    => "full",
-            "icon"        => WPB_PLUGIN_URL.'assets/img/icon.png',
+            "icon"        => $this->plugin_url.'assets/img/icon.png',
             "category"    => __('Content', 'js_composer'),
             "params"      => array(
                 array(
                     "type"        => "dropdown",
                     "holder"      => "div",
                     "heading"     => __("Select Content Block by slug",
-                        'block'),
+                        'content_block'),
                     "param_name"  => "slug",
                     "value"       => $this->content_block_slug_list,
                     "description" => __("Select content block to insert on this page",
-                        'block')
+                        'content_block')
                 ),
             )
         ));
@@ -671,7 +670,7 @@ final class ContentBlock
         <div class="updated">
           <p>'
             .sprintf(__('<strong>%s</strong> requires <strong><a href="http://bit.ly/vcomposer" target="_blank">WPBakery Page builder</a></strong> plugin to be installed and activated on your site.',
-                'block'), $this->post_type_slug).'</p>
+                'content_block'), $this->post_type_slug).'</p>
         </div>';
     }
 

@@ -1,0 +1,173 @@
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Content Blocks\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-03-20 20:50+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: \n"
+"Language: \n"
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Loco https://localise.biz/"
+
+#: includes/ContentBlock.php:673
+#, php-format
+msgid ""
+"<strong>%s</strong> requires <strong><a href=\"http://bit.ly/vcomposer\" "
+"target=\"_blank\">WPBakery Page builder</a></strong> plugin to be installed "
+"and activated on your site."
+msgstr ""
+
+#: includes/ContentBlock.php:178
+msgid "Add block"
+msgstr ""
+
+#: includes/ContentBlock.php:646
+msgid "Add content block"
+msgstr ""
+
+#: includes/ContentBlock.php:179
+msgid "Add new block"
+msgstr ""
+
+#: includes/ContentBlock.php:107
+msgid "Add Paragraph Tags / No Shortcodes"
+msgstr ""
+
+#: includes/ContentBlock.php:105
+msgid "Add Paragraph Tags / Run Shortcodes"
+msgstr ""
+
+#. Author of the plugin
+msgid "Aleksey Tikhomirov"
+msgstr ""
+
+#: includes/ContentBlock.php:177
+msgid "All blocks"
+msgstr ""
+
+#: includes/ContentBlock.php:307
+msgid "Block usage"
+msgstr ""
+
+#: includes/ContentBlock.php:144
+msgid "Blocks"
+msgstr ""
+
+#: includes/ContentBlockWidget.php:26 includes/ContentBlock.php:142
+#: includes/ContentBlock.php:143 includes/ContentBlock.php:222
+msgid "Content Block"
+msgstr ""
+
+#: includes/ContentBlock.php:645
+msgid "Content block"
+msgstr ""
+
+#: includes/ContentBlockWidget.php:104
+msgid "Content Block:"
+msgstr ""
+
+#: includes/ContentBlock.php:171 includes/ContentBlock.php:173
+#: includes/ContentBlock.php:175
+msgid "Content Blocks"
+msgstr ""
+
+#. Name of the plugin
+msgid "Content Blocks like [shortcodes]"
+msgstr ""
+
+#: includes/ContentBlock.php:267
+msgid "Date"
+msgstr ""
+
+#: includes/ContentBlock.php:180
+msgid "Edit block"
+msgstr ""
+
+#: includes/ContentBlock.php:294
+msgid "Enter block title"
+msgstr ""
+
+#: includes/ContentBlock.php:109
+msgid "Full Content Filtering"
+msgstr ""
+
+#. URI of the plugin
+msgid "http://rwsite.ru"
+msgstr ""
+
+#. Author URI of the plugin
+msgid "https://rwsite.ru"
+msgstr ""
+
+#: includes/ContentBlock.php:181 includes/ContentBlock.php:323
+msgid "New block"
+msgstr ""
+
+#: includes/ContentBlock.php:184
+msgid "No blocks found"
+msgstr ""
+
+#: includes/ContentBlock.php:185
+msgid "No blocks found in the Trash"
+msgstr ""
+
+#: includes/ContentBlock.php:103
+msgid "No Paragraph Tags / No Shortcodes"
+msgstr ""
+
+#: includes/ContentBlock.php:101
+msgid "No Paragraph Tags / Run Shortcodes"
+msgstr ""
+
+#: includes/ContentBlock.php:187
+msgid "Parent block"
+msgstr ""
+
+#: includes/ContentBlock.php:152
+msgid "PHP code editor"
+msgstr ""
+
+#: includes/ContentBlockWidget.php:21
+msgid "Place a content/text block in the selected area."
+msgstr ""
+
+#. Description of the plugin
+msgid "Repeatable Content Blocks plugin"
+msgstr ""
+
+#: includes/ContentBlock.php:337
+msgid "Save block before to use it"
+msgstr ""
+
+#: includes/ContentBlock.php:183
+msgid "Search block"
+msgstr ""
+
+#: includes/ContentBlock.php:656
+msgid "Select Content Block by slug"
+msgstr ""
+
+#: includes/ContentBlock.php:660
+msgid "Select content block to insert on this page"
+msgstr ""
+
+#: includes/ContentBlock.php:266
+msgid "Shortcode"
+msgstr ""
+
+#: includes/ContentBlock.php:265
+msgid "Title"
+msgstr ""
+
+#: includes/ContentBlockWidget.php:96
+msgid "Title:"
+msgstr ""
+
+#: includes/ContentBlock.php:182
+msgid "View block"
+msgstr ""
